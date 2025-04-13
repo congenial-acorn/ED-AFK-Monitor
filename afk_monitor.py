@@ -9,7 +9,7 @@ import ctypes
 import re
 import argparse
 try:
-	from discord import SyncWebhook
+	from discord_webhook import DiscordWebhook
 	discord_enabled = True
 except ImportError:
 	discord_enabled = False
@@ -23,7 +23,7 @@ def fallover(message):
 # Internals
 DEBUG_MODE = False
 DISCORD_TEST = False
-VERSION = "250412"
+VERSION = "250413"
 GITHUB_LINK = "https://github.com/PsiPab/ED-AFK-Monitor"
 DUPE_MAX = 5
 MAX_FILES = 10
@@ -221,7 +221,10 @@ print('\nStarting... (Press Ctrl+C to stop)\n')
 # Check webhook appears valid before starting
 reg = r'^https:\/\/(?:canary\.|ptb\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[A-z0-9_-]+$'
 if discord_enabled and re.search(reg, discord_webhook):
-	webhook = SyncWebhook.from_url(discord_webhook)
+	webhook = DiscordWebhook(url=discord_webhook)
+	if discord_identity:
+		webhook.username = "ED AFK Monitor"
+		webhook.avatar_url = "https://cdn.discordapp.com/attachments/1339930614064877570/1354083225923883038/t10.png"
 elif discord_enabled:
 	discord_enabled = False
 	discord_test = False
@@ -231,10 +234,8 @@ elif discord_enabled:
 def discordsend(message=''):
 	if discord_enabled and message and not discord_test:
 		try:
-			if discord_identity:
-				webhook.send(content=message, username="ED AFK Monitor", avatar_url="https://cdn.discordapp.com/attachments/1339930614064877570/1354083225923883038/t10.png")
-			else:
-				webhook.send(content=message)
+			webhook.content = message
+			webhook.execute()
 		except Exception as e:
 			print(f"{Col.WHITE}Discord:{Col.END} Webhook send error: {e}")
 	elif discord_enabled and message and discord_test:
