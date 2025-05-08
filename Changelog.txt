@@ -1,0 +1,83 @@
+------------------------
+ED AFK Monitor Changelog
+------------------------
+
+v250506
+-------
+- Discord forum channel / thread support
+  - To enable: WebhookURL must point to a forum channel (instead of a regular text channel) and ForumChannel must be set to true
+  - Default settings assume a regular channel, so no changes are needed to continue using text channels as before
+- Switched to using discord-webhook library (only relevant for those using the Python version)
+
+v250412
+-------
+- Journal preloading on startup
+  - Journal is read from start to end and events logged to terminal as usual
+  - New argument --resetsession resets session stats after preload (useful for experimenting within a single instance)
+  - Missions completed/remaining and fuel capacity should now always be accurate
+- Preloading also allows completed recent sessions to be output in full using the --fileselect argument
+
+v230329
+-------
+- Optional argument --fileselect presents list of recent journals (with the commander names) to chose from
+- Added tracking and reporting of powerplay merits - uses log level SummaryMerits (@Narcil)
+
+v250325
+-------
+- (Windows only) Track mission stack progress and hourly kill rate in window title
+windowtitle
+- Track total kills and total bounty stats across instances and output on script shutdown (uses existing log levels SummaryKills & SummaryBounties)
+- Log security ship scans (log level SecurityScan, default 2)
+  - This is an early-warning system for hostile (aggroed) security, assuming your fighter is still around to scan them - will also trigger on any manual scans so it's recommended to avoid scanning security (use a keybind for hostile targets only), or set level 0 to disable these logs
+- Log messages indicating attack by security ships (log level SecurityAttack, default 3)
+  - These messages occur only when security scan you and you already have a fine or bounty, however they may come too late compared to SecurityScan so it's recommended to have both on for earlier warning
+- New default avatar for web hook / icon for standalone .exe version (credit to CMDR Qohen Leth)
+- Faction names are now off on kill messages by default. Set BountyFaction = true in Settings to restore
+- Added descriptions to all the log levels
+
+v250311
+-------
+- Optional logging of session bounty values in summary; total value, average/kill and average/hour are included, controlled by log level SummaryBounties (default: 1)
+- Optional addition of bounty value to kill logs (BountyValue), plus faction name is also now optional (BountyFaction)
+- Send a warning when there has been no journal activity for x minutes (default 15). Controlled by new settings InactivityMax for minutes and log level Inactivity
+- Log level Reports has been renamed SummaryKills for consistency with above
+
+v250307
+-------
+- Track number of active missions: These are now shown when the kills are completed for a mission, e.g. 1/20 for the first of a full stack. This information is only available on game load so loading or relogging while the monitor is running is required, otherwise completed missions are presented as in previous versions
+- Include ship type and game mode on game load/relog
+- T10 added to list of hard ships (*really* rare spawn in hard instances)
+- Handle journal parsing errors such as empty lines
+- Only check messages received from NPCs (this prevents players from triggering "Pirate bait value too low" messages for anyone running AFK Monitor)
+- Updated check for stolen cargo for greater accuracy
+
+v250220
+-------
+- A name and avatar is now sent for the webhook by default (can be disabled in config to use settings in Discord)
+- New kills/hour setting for increasing the 'Reports' log level when kills/hour drop below threshold (i.e. ping on low kill rate)
+- Fix for unexpected characters in in-game chat causing script to stop
+
+v250212
+-------
+- Config profiles: Every config setting can now be stored under additional profiles and loaded via the -p <name> argument. E.g. create a new config section called [MyAltProfile] and add Discord.WebhookURL = "<webhook>" to it then pass -p MyAltProfile via command line or shortcut to use that webhook. Only overrides need to be defined, all others default to the main settings
+
+v250211
+-------
+- Command line arguments for passing journal folder, webhook and number of missions to use for MissionsAll
+- New log level MissionsAll and related setting, defaults to ping on 20 mission completions
+- More robust journal name checking to prevent loading of e.g. legacy journals (thanks @skywalker-elite)
+- Alternate f-string quote types (prevents fail in Python versions before 3.12)
+
+v250207.1
+---------
+- Handle errors and continue when sending webhook messages
+- Fix log level = 0 not working correctly
+
+v250206
+-------
+- Timestamps on Discord messages can now be disabled via config
+- Make paths OS-agnostic (@IndorilReborn in #2)
+
+v250205
+-------
+- First release
