@@ -70,7 +70,7 @@ To reset any log levels to defaults simply copy the appropriate values from `afk
 
 ### I get some output to terminal then nothing else
 
-By default AFK Monitor watches your latest journal, so make sure to start it after loading the game or it may process an older journal and produce no further output. If you want to monitor a different journal pass --fileselect when starting AFK Monitor and you will be presented with a list of recent journals to chose from.
+By default AFK Monitor watches your latest journal, so make sure to start it after loading the game or it may process an older journal and produce no further output. If you want to monitor a different journal pass `--fileselect` when starting AFK Monitor and you will be presented with a list of recent journals to chose from.
 
 ### I'm noticing kills in-game that aren't being logged
 

@@ -23,13 +23,14 @@ def fallover(message):
 # Internals
 DEBUG_MODE = False
 DISCORD_TEST = False
-VERSION = "250506"
+VERSION = "250518"
 GITHUB_LINK = "https://github.com/PsiPab/ED-AFK-Monitor"
 DUPE_MAX = 5
 MAX_FILES = 10
 FUEL_LOW = 0.2		# 20%
 FUEL_CRIT = 0.1		# 10%
 TRUNC_FACTION = 30
+KILLS_RECENT = 10
 SHIPS_EASY = ['Adder', 'Asp Explorer', 'Asp Scout', 'Cobra Mk III', 'Cobra Mk IV', 'Diamondback Explorer', 'Diamondback Scout', 'Eagle', 'Imperial Courier', 'Imperial Eagle', 'Krait Phantom', 'Sidewinder', 'Viper Mk III', 'Viper Mk IV']
 SHIPS_HARD = ['Alliance Crusader', 'Alliance Challenger', 'Alliance Chieftain', 'Anaconda', 'Federal Assault Ship', 'Federal Dropship', 'Federal Gunship', 'Fer-de-Lance', 'Imperial Clipper', 'Krait MK II', 'Python', 'Vulture', 'Type-10 Defender']
 BAIT_MESSAGES = ['$Pirate_ThreatTooHigh', '$Pirate_NotEnoughCargo', '$Pirate_OnNoCargoFound']
@@ -97,6 +98,7 @@ setting_lowkillrate = getconfig('Settings', 'LowKillRate', 20)
 setting_inactivitymax = getconfig('Settings', 'InactivityMax', 15)
 setting_bountyfaction = getconfig('Settings', 'BountyFaction', True)
 setting_bountyvalue = getconfig('Settings', 'BountyValue', False)
+setting_extendedstats = getconfig('Settings', 'ExtendedStats', False)
 setting_dynamictitle = getconfig('Settings', 'DynamicTitle', True)
 discord_webhook = args.webhook if args.webhook is not None else getconfig('Discord', 'WebhookURL', '')
 discord_forumchannel = getconfig('Discord', 'ForumChannel', False)
@@ -120,6 +122,7 @@ class Instance:
 		self.scans = []
 		self.lastkill = 0
 		self.killstime = 0
+		self.killsrecent = []
 		self.kills = 0
 		self.bounties = 0
 		self.merits = 0
@@ -129,6 +132,7 @@ class Instance:
 		self.scans = []
 		self.lastkill = 0
 		self.killstime = 0
+		self.killsrecent = []
 		self.kills = 0
 		self.bounties = 0
 		self.merits = 0
@@ -337,6 +341,8 @@ def processevent(line):
 					seconds = (thiskill-session.lastkill).total_seconds()
 					killtime = f' (+{time_format(seconds)})'
 					session.killstime += seconds
+					if len(session.killsrecent) == KILLS_RECENT: session.killsrecent.pop(0)
+					session.killsrecent.append(seconds)
 					track.totaltime += seconds
 				session.lastkill = logtime
 
@@ -357,13 +363,20 @@ def processevent(line):
 						msg_discord=f"**{ship}{hard}{killtime}**{bountyvalue}{bountyfaction}",
 						emoji='💥', timestamp=logtime, loglevel=log)
 				
+				# Output stats every 10 kills
 				if session.kills % 10 == 0 and this_json['event'] == 'Bounty':
 					avgseconds = session.killstime / (session.kills - 1)
 					kills_hour = round(3600 / avgseconds, 1)
 					avgbounty = session.bounties // session.kills
 					bounties_hour = round(3600 / (session.killstime / session.bounties))
+					if setting_extendedstats and session.kills > KILLS_RECENT:
+						avgsecondsrecent = sum(session.killsrecent) / (KILLS_RECENT)
+						kills_hour_recent = f' [Last {KILLS_RECENT}: {round(3600 / avgsecondsrecent, 1)}/hr]'
+					else:
+						kills_hour_recent = ''
 					log = getloglevel('SummaryKills') if kills_hour > setting_lowkillrate else getloglevel('SummaryKills')+1
-					logevent(msg_term=f'Session kills: {session.kills:,} ({kills_hour}/hr | {time_format(avgseconds)}/kill)',
+					logevent(msg_term=f'Session kills: {session.kills:,} ({kills_hour}/hr | {time_format(avgseconds)}/kill){kills_hour_recent}',
+			  				msg_discord=f'**Session kills: {session.kills:,} ({kills_hour}/hr | {time_format(avgseconds)}/kill)**{kills_hour_recent}',
 							emoji='📝', timestamp=logtime, loglevel=log)
 					logevent(msg_term=f'Session bounties: {num_format(session.bounties)} ({num_format(bounties_hour)}/hr | {num_format(avgbounty)}/kill)',
 							emoji='📝', timestamp=logtime, loglevel=getloglevel('SummaryBounties'))

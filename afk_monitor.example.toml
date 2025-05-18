@@ -13,6 +13,8 @@ InactivityMax = 15
 BountyFaction = false
 # BountyValue shows credits earned on each kill (Default: false)
 BountyValue = false
+# ExtendedStats shows extra stats e.g. recent kill rate (Default: false)
+ExtendedStats = false
 # DynamicTitle uses the window title to display some info (Default: true, only works on Windows OS)
 DynamicTitle = true
 
