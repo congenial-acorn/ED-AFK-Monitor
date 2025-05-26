@@ -358,11 +358,13 @@ def processevent(line):
 					log = getloglevel('KillHard')
 					hard = ' ☠️'
 				
+				kills_t = f' x{session.kills}' if setting_extendedstats else ''
+				kills_d = f'x{session.kills} ' if setting_extendedstats else ''
 				bountyvalue = f' [{num_format(this_json['Rewards'][0]['Reward'])} cr]' if setting_bountyvalue else ''
 				bountyfaction = this_json['VictimFaction'] if len(this_json['VictimFaction']) <= TRUNC_FACTION+3 else f'{this_json['VictimFaction'][:TRUNC_FACTION].rstrip()}...'
 				bountyfaction = f' [{bountyfaction}]' if setting_bountyfaction else ''
-				logevent(msg_term=f"{col}Kill{Col.END}: {ship}{killtime}{bountyvalue}{bountyfaction}",
-						msg_discord=f"**{ship}{hard}{killtime}**{bountyvalue}{bountyfaction}",
+				logevent(msg_term=f"{col}Kill{Col.END}{kills_t}: {ship}{killtime}{bountyvalue}{bountyfaction}",
+						msg_discord=f"{kills_d}**{ship}{hard}{killtime}**{bountyvalue}{bountyfaction}",
 						emoji='💥', timestamp=logtime, loglevel=log)
 				
 				# Output stats every 10 kills
