@@ -2,6 +2,15 @@
 ED AFK Monitor Changelog
 ------------------------
 
+v250527
+-------
+- New 'ExtendedStats' setting adds:
+  - Number of session kills on kill events
+  - Average kill rate for last 10 kills on session reports
+  - Count of session bait fails on bait fail events
+- Added commander rank and rank progress to load event
+- Added Changelog.txt (wait, that's this!)
+
 v250506
 -------
 - Discord forum channel / thread support
