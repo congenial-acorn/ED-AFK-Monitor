@@ -154,7 +154,7 @@ class Tracking():
 		self.missionsactive = []
 		self.missionredirects = 0
 		self.lastevent = ''
-		self.dupemsg = ''
+		self.dupeevent = ''
 		self.duperepeats = 1
 		self.dupewarn = False
 		self.lastactivity = None
@@ -261,7 +261,7 @@ def discordsend(message=''):
 		print(f'{Col.WHITE}DISCORD:{Col.END} {message}')
 
 # Log events
-def logevent(msg_term, msg_discord=None, emoji='', timestamp=None, loglevel=2):
+def logevent(msg_term, msg_discord=None, emoji='', timestamp=None, loglevel=2, event=None):
 	loglevel = int(loglevel)
 	if track.preloading:
 		loglevel = 1 if loglevel > 0 else 0
@@ -273,12 +273,12 @@ def logevent(msg_term, msg_discord=None, emoji='', timestamp=None, loglevel=2):
 	if loglevel > 0 and not discord_test: print(f'[{logtime}]{emoji} {msg_term}')
 	track.logged +=1
 	if discord_enabled and loglevel > 1:
-		if track.dupemsg == msg_term:
+		if event is not None and track.dupeevent == event:
 			track.duperepeats += 1
 		else:
 			track.duperepeats = 1
 			track.dupewarn = False
-		track.dupemsg = msg_term
+		track.dupeevent = event
 		discord_message = msg_discord if msg_discord else f'**{msg_term}**'
 		ping = f' <@{discord_user}>' if loglevel > 2 and track.duperepeats == 1 else ''
 		logtime = f' {{{logtime}}}' if discord_timestamp else ''
@@ -475,7 +475,7 @@ def processevent(line):
 					baitfails = f' (x{session.baitfails})' if setting_extendedstats else ''
 					logevent(msg_term=f'{Col.WARN}Pirate didn\'t engage due to insufficient cargo value{baitfails}{Col.END}',
 							msg_discord=f'**Pirate didn\'t engage due to insufficient cargo value**{baitfails}',
-							emoji='🎣', timestamp=logtime, loglevel=getloglevel('BaitValueLow'))
+							emoji='🎣', timestamp=logtime, loglevel=getloglevel('BaitValueLow'), event='BaitValueLow')
 				elif 'Police_Attack' in this_json['Message']:
 					logevent(msg_term=f'{Col.BAD}Under attack by security services!{Col.END}',
 							msg_discord=f'**Under attack by security services!**',
@@ -484,7 +484,7 @@ def processevent(line):
 				name = this_json['Type_Localised'] if 'Type_Localised' in this_json else this_json['Type'].title()
 				logevent(msg_term=f'{Col.BAD}Cargo stolen!{Col.END} ({name})',
 						msg_discord=f'**Cargo stolen!** ({name})',
-						emoji='📦', timestamp=logtime, loglevel=getloglevel('CargoLost'))
+						emoji='📦', timestamp=logtime, loglevel=getloglevel('CargoLost'), event='CargoLost')
 			case 'Rank':
 				track.cmdrcombatrank = this_json['Combat']
 			case 'Progress':
