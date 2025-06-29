@@ -157,6 +157,7 @@ class Instance:
 
 class Tracking():
 	def __init__(self):
+		self.deployed = False
 		self.fuelcapacity = 64
 		self.totalkills = 0
 		self.totaltime = 0
@@ -333,6 +334,7 @@ def processevent(line):
 							msg_discord=f'**Scanned security** ({ship})',
 							emoji='🚨', timestamp=logtime, loglevel=getloglevel('SecurityScan'))
 				elif not ship in session.scans and (this_json['Ship'] in SHIPS_EASY or this_json['Ship'] in SHIPS_HARD):
+					track.deployed = True
 					session.scans.append(ship)
 					hard = ''
 					log = getloglevel('ScanEasy')
@@ -348,6 +350,7 @@ def processevent(line):
 							msg_discord=f'**{ship}**{hard}{rank}',
 							emoji='🔎', timestamp=logtime, loglevel=log)
 			case 'Bounty' | 'FactionKillBond':
+				track.deployed = True
 				session.scans.clear()
 				session.kills +=1
 				track.totalkills +=1
@@ -475,6 +478,7 @@ def processevent(line):
 						msg_discord='**Ship destroyed!**',
 						emoji='💀', timestamp=logtime, loglevel=getloglevel('Died'))
 			case 'Music' if this_json['MusicTrack'] == 'MainMenu':
+				track.deployed = False
 				logevent(msg_term='Exited to main menu',
 					emoji='🚪', timestamp=logtime, loglevel=2)
 				track.inactivitywarn = False
@@ -492,6 +496,7 @@ def processevent(line):
 				track.fuelcapacity = this_json['FuelCapacity']['Main'] if this_json['FuelCapacity']['Main'] >= 2 else 64
 				debug(f"Fuel capacity: {track.fuelcapacity}")
 			case 'SupercruiseDestinationDrop' if any(x in this_json['Type'] for x in ['$MULTIPLAYER', '$Warzone_Powerplay']):
+				track.deployed = True
 				logevent(msg_term=f"Dropped at {this_json['Type_Localised']}",
 						emoji='🚀', timestamp=logtime, loglevel=2)
 				session.reset()
@@ -544,8 +549,9 @@ def processevent(line):
 				logevent(msg_term='Quit to desktop',
 						emoji='🛑', timestamp=logtime, loglevel=2)
 				if __name__ == "__main__": sys.exit()
-			case 'SupercruiseEntry':
+			case 'SupercruiseEntry' | 'FSDJump':
 				session.reset()
+				track.deployed = False
 		track.lastevent = this_json['event']
 	except Exception as e:
 		print(f"{Col.WHITE}Warning:{Col.END} Process event went wrong: {e}")
