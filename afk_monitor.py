@@ -385,7 +385,7 @@ def processevent(line):
 					ship = j['Target_Localised'] if 'Target_Localised' in j else j['Target'].title()
 				else:
 					bountyvalue = j['Reward']
-					ship = 'Powerplay'
+					ship = 'Unknown'
 					track.killtype = 'bonds'
 
 				session.bounties += bountyvalue
@@ -516,7 +516,7 @@ def processevent(line):
 			case 'Loadout':
 				track.fuelcapacity = j['FuelCapacity']['Main'] if j['FuelCapacity']['Main'] >= 2 else 64
 				#debug(f"Fuel capacity: {track.fuelcapacity}")
-			case 'SupercruiseDestinationDrop' if any(x in j['Type'] for x in ['$MULTIPLAYER', '$Warzone_Powerplay']):
+			case 'SupercruiseDestinationDrop' if any(x in j['Type'] for x in ['$MULTIPLAYER', '$Warzone']):
 				track.deployed = True
 				logevent(msg_term=f"Dropped at {j['Type_Localised']}",
 						emoji='🚀', timestamp=logtime, loglevel=2)
