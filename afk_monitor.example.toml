@@ -40,8 +40,8 @@ Identity = true
 # 3 = Terminal & Discord with user ping
 ScanEasy = 1            # Scans of 'easy' ships (Sidewinder etc.)
 ScanHard = 2            # Scans of 'hard' ships (Python etc.)
-KillEasy = 2            # Kills (bounties) of easy ships
-KillHard = 2            # Kills (bounties) of hard ships
+KillEasy = 2            # Kills (bounty or bond) of easy ships
+KillHard = 2            # Kills (bounty or bond) of hard ships
 FighterHull = 2         # Fighter hull damage (20% increments)
 FighterDown = 3         # Fighter destroyed
 ShipShields = 3         # Ship shield failure
@@ -57,8 +57,8 @@ FuelCritical = 3        # Fuel level critical (under 10%)
 Missions = 2            # Kills completed for a mission
 MissionsAll = 3         # Kills completed for all missions
 SummaryKills = 2        # Summary of kills every 10 and at close
-SummaryBounties = 1     # Summary of credits earned from bounties
-SummaryMerits = 2       # Summary of powerplay merits (only if any earned)
+SummaryBounties = 2     # Summary of credits earned from bounties or bonds
+SummaryMerits = 2       # Summary of powerplay merits (if any earned)
 Inactivity = 3          # Warning of no recent journal activity
 
 # Custom profiles (advanced)
