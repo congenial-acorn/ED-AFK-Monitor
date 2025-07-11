@@ -32,10 +32,11 @@ FUEL_LOW = 0.2		# 20%
 FUEL_CRIT = 0.1		# 10%
 TRUNC_FACTION = 30
 KILLS_RECENT = 10
+MERITS_MIN = 12
 SHIPS_EASY = ['adder', 'asp', 'asp_scout', 'cobramkiii', 'cobramkiv', 'diamondback', 'diamondbackxl', 'eagle', 'empire_courier', 'empire_eagle', 'krait_light', 'sidewinder', 'viper', 'viper_mkiv']
 SHIPS_HARD = ['typex', 'typex_2', 'typex_3', 'anaconda', 'federation_dropship_mkii', 'federation_dropship', 'federation_gunship', 'ferdelance', 'empire_trader', 'krait_mkii', 'python', 'vulture', 'type9_military']
 BAIT_MESSAGES = ['$Pirate_ThreatTooHigh', '$Pirate_NotEnoughCargo', '$Pirate_OnNoCargoFound']
-LOGLEVEL_DEFAULTS = {'ScanEasy': 1, 'ScanHard': 2, 'KillEasy': 2, 'KillHard': 2, 'FighterHull': 2, 'FighterDown': 3, 'ShipShields': 3, 'ShipHull': 3, 'Died': 3, 'CargoLost': 3, 'BaitValueLow': 2, 'SecurityScan': 2, 'SecurityAttack': 3, 'FuelLow': 2, 'FuelCritical': 3, 'FuelReport': 1, 'Missions': 2, 'MissionsAll': 3, 'SummaryKills': 2, 'SummaryBounties': 2, 'SummaryMerits': 2, 'Inactivity': 3}
+LOGLEVEL_DEFAULTS = {'ScanEasy': 1, 'ScanHard': 2, 'KillEasy': 2, 'KillHard': 2, 'FighterHull': 2, 'FighterDown': 3, 'ShipShields': 3, 'ShipHull': 3, 'Died': 3, 'CargoLost': 3, 'BaitValueLow': 2, 'SecurityScan': 2, 'SecurityAttack': 3, 'FuelLow': 2, 'FuelCritical': 3, 'FuelReport': 1, 'Missions': 2, 'MissionsAll': 3, 'Merits': 1, 'SummaryKills': 2, 'SummaryBounties': 2, 'SummaryMerits': 2, 'Inactivity': 3}
 COMBAT_RANKS = ['Harmless', 'Mostly Harmless', 'Novice', 'Compentent', 'Expert', 'Master', 'Dangerous', 'Deadly', 'Elite', 'Elite I', 'Elite II', 'Elite III', 'Elite IV', 'Elite V']
 
 class Col:
@@ -386,7 +387,7 @@ def processevent(line):
 					ship = j['Target_Localised'] if 'Target_Localised' in j else j['Target'].title()
 				else:
 					bountyvalue = j['Reward']
-					ship = 'Unknown'
+					ship = 'Bond'
 					track.killtype = 'bonds'
 
 				session.bounties += bountyvalue
@@ -423,7 +424,6 @@ def processevent(line):
 						merits_hour = round(3600 / (session.killstime / session.merits)) if session.merits > 0 else 0
 						logevent(msg_term=f'Session merits: {session.merits:,} ({merits_hour:,}/hr | {avgmerits:,}/kill)',
 								emoji='📝', timestamp=logtime, loglevel=getloglevel('SummaryMerits'))
-				
 				updatetitle()
 			case 'MissionRedirected' if 'Mission_Massacre' in j['Name']:
 				track.missionredirects += 1
@@ -568,6 +568,9 @@ def processevent(line):
 			case 'PowerplayMerits':
 				session.merits += j['MeritsGained']
 				track.totalmerits += j['MeritsGained']
+				if j['MeritsGained'] > MERITS_MIN:
+					logevent(msg_term=f'Merits: +{j['MeritsGained']} ({j['Power']})',
+			  			emoji='🎫', timestamp=logtime, loglevel=getloglevel('Merits'))
 			case 'Shutdown':
 				logevent(msg_term='Quit to desktop',
 						emoji='🛑', timestamp=logtime, loglevel=2)

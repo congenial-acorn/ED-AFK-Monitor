@@ -58,7 +58,8 @@ Missions = 2            # Kills completed for a mission
 MissionsAll = 3         # Kills completed for all missions
 SummaryKills = 2        # Summary of kills every 10 and at close
 SummaryBounties = 2     # Summary of credits earned from bounties or bonds
-SummaryMerits = 2       # Summary of powerplay merits (if any earned)
+Merits = 1              # Merits gained (powerplay-only)
+SummaryMerits = 2       # Summary of merits (powerplay-only)
 Inactivity = 3          # Warning of no recent journal activity
 
 # Custom profiles (advanced)
