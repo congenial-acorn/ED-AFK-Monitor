@@ -2,6 +2,13 @@
 ED AFK Monitor Changelog
 ------------------------
 
+WIP
+---
+- Real-time monitoring of kill rate and interval for improved warnings of dead or poor instances
+  - At the start of a new instance warn if 5 minutes pass without any kills
+  - Warn if the hourly kill rate average drops below the configured amount
+  - Warn if there have been no kills for the configured number of minutes
+
 v250701
 -------
 - Report estimated time fuel will last on fuel messages

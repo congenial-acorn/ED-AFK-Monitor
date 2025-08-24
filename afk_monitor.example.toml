@@ -5,10 +5,10 @@
 JournalFolder = ''
 # UseUTC = false (default) uses local timezone, set true for UTC (in-game time)
 UseUTC = false
-# LowKillRate is a kills/hour threshold; if average drops below, log level 'Reports' is raised by 1 (Default: 20, 0 to disable)
-LowKillRate = 20
-# InactivityMax is time in minutes between journal updates before logging a warning (Default: 15, 0 to disable)
-InactivityMax = 15
+# WarnKillRate sends a warning if kills/hour drop below set amount (Default: 20, log level 'KillRate')
+WarnKillRate = 20
+# WarnNoKills is time in minutes since last kill before sending a warning (Default: 20, log level 'NoKills')
+WarnNoKills = 20
 # BountyFaction shows faction name on each kill (Default: false)
 BountyFaction = false
 # BountyValue shows credits earned on each kill (Default: false)
@@ -60,7 +60,8 @@ SummaryKills = 2        # Summary of kills every 10 and at close
 SummaryBounties = 2     # Summary of credits earned from bounties or bonds
 Merits = 1              # Merits gained (powerplay-only)
 SummaryMerits = 2       # Summary of merits (powerplay-only)
-Inactivity = 3          # Warning of no recent journal activity
+NoKills = 3             # Warning of no kills for configured time ('WarnNoKills' in Settings)
+KillRate = 3            # Warning of low kill rate per hour ('WarnKillRate' in Settings)
 
 # Custom profiles (advanced)
 # You can set additional profiles to override settings as per the example below
