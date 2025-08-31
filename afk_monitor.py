@@ -597,7 +597,7 @@ def processevent(line):
 def time_format(seconds: int) -> str:
 	if seconds is not None:
 		seconds = int(seconds)
-		h = seconds // 3600 % 24
+		h = seconds // 3600
 		m = seconds % 3600 // 60
 		s = seconds % 3600 % 60
 		if h > 0:
