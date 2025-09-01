@@ -8,6 +8,11 @@ WIP
   - At the start of a new instance warn if 5 minutes pass without any kills
   - Warn if the hourly kill rate average drops below the configured amount
   - Warn if there have been no kills for the configured number of minutes
+- Real-time window title updating (Windows OS only)
+  - Kills per hour are now live and based on deploy time (=more accurate)
+  - Addition of elapsed time since previous kill
+- Reporting of merits gained (log level 'Merits')
+- Improved error messages (that you hopefully won't see)
 
 v250701
 -------

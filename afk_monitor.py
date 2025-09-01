@@ -191,7 +191,7 @@ class Tracking:
 		if self.deploytime:
 			debug(f'Session tracking ended at {self.thiseventtime} ({time_format((self.thiseventtime-self.deploytime).total_seconds())})')
 			self.deploytime = None
-			updatetitle()
+			updatetitle(True)
 
 session = Instance()
 track = Tracking()
@@ -617,17 +617,23 @@ def num_format(number: int) -> str:
         else:
             return number
 
-def updatetitle():
+def updatetitle(reset=False):
 	# Title (Windows-only)
-	if setting_dynamictitle and os.name=='nt' and not track.preloading:
-		if session.kills > 1 and session.killstime > 0:
-			kills_hour = round(3600 / (session.killstime / (session.kills - 1)), 1)
-			if session.kills < 20:
-				kills_hour = f'{kills_hour}*'
-		else:
-			kills_hour = '-'
-
-		ctypes.windll.kernel32.SetConsoleTitleW(f'EDAFKM 🎯{track.missionredirects}/{len(track.missionsactive)} 💥{kills_hour}/h')
+	if os.name=='nt':
+		if setting_dynamictitle and not track.preloading and track.deploytime:
+			timeutc = datetime.now(timezone.utc)
+			if session.kills > 0:
+				kills_hour = round((3600 / ((timeutc - track.deploytime).total_seconds() / session.kills)), 1)
+				kills_hour = f'{kills_hour}/h' if session.kills > 19 else f'{kills_hour}*/h'
+				lastkill = time_format(round((timeutc - session.lastkill).total_seconds()))
+			else:
+				kills_hour = '-/h'
+				lastkill = time_format(round((timeutc - track.deploytime).total_seconds()))
+			
+			ctypes.windll.kernel32.SetConsoleTitleW(f'💥{kills_hour} ⌚{lastkill} 🎯{track.missionredirects}/{len(track.missionsactive)}')
+		elif reset == True:
+			ctypes.windll.kernel32.SetConsoleTitleW(f'ED AFK Monitor v{VERSION}')
+			debug('Title update')
 
 def shutdown():
 	if track.totalkills > 1:
@@ -667,8 +673,7 @@ if __name__ == '__main__':
 			session.reset()
 			logevent(msg_term=f'Session stats reset',
 					emoji='🔄', loglevel=1)
-		else:
-			updatetitle()
+		updatetitle(True)
 
 		# Send Discord startup
 		update_notice = f'\n:arrow_up: Update **[v{latest_version}](https://github.com/{GITHUB_REPO}/releases)** available!' if VERSION < latest_version else ''
