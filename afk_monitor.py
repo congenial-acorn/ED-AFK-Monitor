@@ -177,8 +177,8 @@ class Tracking:
 		self.cmdrcombatprogress = None
 		self.lastcheck = None
 	
-	def sessionstart(self):
-		if not self.deploytime:
+	def sessionstart(self, reset=False):
+		if not self.deploytime or reset:
 			self.deploytime = self.thiseventtime
 			debug(f'Session tracking started at {self.deploytime}')
 			session.reset()
@@ -525,7 +525,7 @@ def processevent(line):
 				track.fuelcapacity = j['FuelCapacity']['Main'] if j['FuelCapacity']['Main'] >= 2 else 64
 				#debug(f"Fuel capacity: {track.fuelcapacity}")
 			case 'SupercruiseDestinationDrop' if any(x in j['Type'] for x in ['$MULTIPLAYER', '$Warzone']):
-				track.sessionstart()
+				track.sessionstart(True)
 				logevent(msg_term=f"Dropped at {j['Type_Localised']}",
 						emoji='🚀', timestamp=logtime, loglevel=2)
 				debug(f'Deploy time by supercruise drop: {track.deploytime}')
