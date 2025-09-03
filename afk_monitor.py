@@ -422,10 +422,9 @@ def processevent(line):
 						kills_hour_recent = f' [Last {KILLS_RECENT}: {round(3600 / avgsecondsrecent, 1)}/hr]'
 					else:
 						kills_hour_recent = ''
-					log = getloglevel('SummaryKills') if kills_hour > setting_warnkillrate else getloglevel('SummaryKills')+1
 					logevent(msg_term=f'Session kills: {session.kills:,} ({kills_hour}/hr | {time_format(avgseconds)}/kill){kills_hour_recent}',
 			  				msg_discord=f'**Session kills: {session.kills:,} ({kills_hour}/hr | {time_format(avgseconds)}/kill)**{kills_hour_recent}',
-							emoji='📝', timestamp=logtime, loglevel=log)
+							emoji='📝', timestamp=logtime, loglevel=getloglevel('SummaryKills'))
 					logevent(msg_term=f'Session {track.killtype}: {num_format(session.bounties)} ({num_format(bounties_hour)}/hr | {num_format(avgbounty)}/kill)',
 							emoji='📝', timestamp=logtime, loglevel=getloglevel('SummaryBounties'))
 					if session.merits > 0:
