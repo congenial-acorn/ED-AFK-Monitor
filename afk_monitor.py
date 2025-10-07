@@ -1,13 +1,13 @@
-import time
-import json
-from pathlib import Path
-import sys
-from datetime import datetime, timezone
-import tomllib
-import os
-import ctypes
-import re
 import argparse
+import ctypes
+import json
+import os
+import re
+import sys
+import time
+import tomllib
+from datetime import datetime, timezone
+from pathlib import Path
 from urllib.request import urlopen
 try:
     from discord_webhook import DiscordWebhook
