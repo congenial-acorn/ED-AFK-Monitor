@@ -80,9 +80,12 @@ else:
     configfile = Path(__file__).parent / "afk_monitor.toml"
 if configfile.is_file():
     with open(configfile, mode="rb") as f:
-        config = tomllib.load(f)
+        try:
+            config = tomllib.load(f)
+        except tomllib.TOMLDecodeError as e:
+            fallover(f"Config decode error: {e}")
 else:
-    fallover("Config file not found - copy and rename afk_monitor.example.toml to afk_monitor.toml\n")
+    fallover("Config file not found: copy and rename afk_monitor.example.toml to afk_monitor.toml\n")
 
 # Command line overrides
 parser = argparse.ArgumentParser(
