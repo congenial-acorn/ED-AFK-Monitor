@@ -406,6 +406,12 @@ def getloglevel(key=None) -> int:
         print(f"{Col.WHITE}Warning:{Col.END} '{key}' not found in 'LogLevels' (using default of {level})")
         return level
 
+def perhour(seconds=0, precision=None):
+    if seconds > 0:
+        return round(3600 / seconds, precision)
+    else:
+        return 0
+
 # Process incoming journal entries
 def processevent(line):
     try:
@@ -494,12 +500,12 @@ def processevent(line):
                 # Output stats every 10 kills
                 if session.kills % 10 == 0:
                     avgseconds = session.killstime / (session.kills - 1)
-                    kills_hour = round(3600 / avgseconds, 1)
+                    kills_hour = perhour(avgseconds, 1)
                     avgbounty = session.bounties // session.kills
-                    bounties_hour = round(3600 / (session.killstime / session.bounties))
+                    bounties_hour = perhour(session.killstime / session.bounties)
                     if setting_extendedstats and session.kills > KILLS_RECENT:
                         avgsecondsrecent = sum(session.killsrecent) / (KILLS_RECENT)
-                        kills_hour_recent = f" [Last {KILLS_RECENT}: {round(3600 / avgsecondsrecent, 1)}/hr]"
+                        kills_hour_recent = f" [Last {KILLS_RECENT}: {perhour(avgsecondsrecent, 1)}/hr]"
                     else:
                         kills_hour_recent = ""
                     logevent(msg_term=f"Session kills: {session.kills:,} ({kills_hour}/hr | {time_format(avgseconds)}/kill){kills_hour_recent}",
@@ -509,7 +515,7 @@ def processevent(line):
                             emoji="📝", timestamp=logtime, loglevel=getloglevel("SummaryBounties"))
                     if session.merits > 0:
                         avgmerits = session.merits // session.kills
-                        merits_hour = round(3600 / (session.killstime / session.merits)) if session.merits > 0 else 0
+                        merits_hour = perhour(session.killstime / session.merits) if session.merits > 0 else 0
                         logevent(msg_term=f"Session merits: {session.merits:,} ({merits_hour:,}/hr | {avgmerits:,}/kill)",
                                 emoji="📝", timestamp=logtime, loglevel=getloglevel("SummaryMerits"))
                 updatetitle()
@@ -703,7 +709,7 @@ def updatetitle(reset=False):
         if setting_dynamictitle and not track.preloading and track.deploytime:
             timeutc = datetime.now(timezone.utc)
             if session.kills > 0:
-                kills_hour = round((3600 / ((timeutc - track.deploytime).total_seconds() / session.kills)), 1)
+                kills_hour = perhour((timeutc - track.deploytime).total_seconds() / session.kills, 1)
                 kills_hour = f"{kills_hour}/h" if session.kills > 19 else f"{kills_hour}*/h"
                 lastkill = time_format(round((timeutc - session.lastkill).total_seconds()))
             else:
@@ -718,16 +724,16 @@ def updatetitle(reset=False):
 def shutdown():
     if track.totalkills > 1:
         avgseconds = track.totaltime / (track.totalkills - 1)
-        kills_hour = round(3600 / avgseconds, 1)
+        kills_hour = perhour(avgseconds, 1)
         avgbounty = track.totalbounties // track.totalkills
-        bounties_hour = round(3600 / (track.totaltime / track.totalbounties))
+        bounties_hour = perhour(track.totaltime / track.totalbounties)
         logevent(msg_term=f"Total kills: {track.totalkills:,} ({kills_hour}/hr | {time_format(avgseconds)}/kill)",
                 emoji="📝", loglevel=getloglevel("SummaryKills"))
         logevent(msg_term=f"Total {track.killtype}: {num_format(track.totalbounties)} ({num_format(bounties_hour)}/hr | {num_format(avgbounty)}/kill)",
                 emoji="📝", loglevel=getloglevel("SummaryBounties"))
         if track.totalmerits > 0:
             avgmerits = track.totalmerits // track.totalkills
-            merits_hour = round(3600 / (track.totaltime / track.totalmerits)) if track.totalmerits > 0 else 0
+            merits_hour = perhour(track.totaltime / track.totalmerits) if track.totalmerits > 0 else 0
             logevent(msg_term=f"Total merits: {track.totalmerits:,} ({merits_hour:,}/hr | {avgmerits:,}/kill)",
                     emoji="📝", loglevel=getloglevel("SummaryMerits"))
     logevent(msg_term=f"Monitor stopped ({journal_file})",
@@ -798,7 +804,7 @@ if __name__ == "__main__":
                                         track.warnedkillrate = None
                                     
                                     # Check average kill rate
-                                    kills_hour = round(3600 / (sessionsecs / session.kills), 1)
+                                    kills_hour = perhour(sessionsecs / session.kills, 1)
                                     #debug(f"Kills per hour {kills_hour}")
                                     if kills_hour < setting_warnkillrate:
                                         if not track.warnedkillrate and sessionsecs >= (5 * 60) and (not track.warnednokills or
