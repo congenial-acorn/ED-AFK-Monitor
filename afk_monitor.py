@@ -24,8 +24,8 @@ def fallover(message):
 # Internals
 DEBUG_MODE = False
 DISCORD_TEST = False
-VERSION = 251009
-GITHUB_REPO = "PsiPab/ED-AFK-Monitor"
+VERSION = "1.0.4"
+GITHUB_REPO = "congenial-acorn/ED-AFK-Monitor"
 DUPE_MAX = 5
 MAX_FILES = 10
 FUEL_LOW = 0.2		# 20%
@@ -66,7 +66,7 @@ except Exception:
     pass
 
 # Print header
-title = f"ED AFK Monitor v{VERSION} by CMDR PSIPAB"
+title = f"ED AFK Monitor v{VERSION} by Congenial Acorn Developments, forked from v2025094 by CMDR PsiPab"
 print(f"{Col.CYAN}{'='*len(title)}")
 print(f"{title}")
 print(f"{'='*len(title)}{Col.END}\n")
