@@ -97,6 +97,7 @@ parser.add_argument("-w", "--webhook", help="Override for Discord webhook URL")
 parser.add_argument("-r", "--resetsession", action="store_true", default=None, help="Reset session stats after preloading")
 parser.add_argument("-t", "--test", action="store_true", default=None, help="Re-routes Discord messages to terminal")
 parser.add_argument("-d", "--debug", action="store_true", default=None, help="Print information for debugging")
+parser.add_argument("-a", "--autoshutdown", action="store_true", default=None, help="Auto-shutdown machine when all missions completed")
 file_group = parser.add_mutually_exclusive_group()
 file_group.add_argument("-s", "--setfile", help="Set specific journal file to use")
 file_group.add_argument("-f", "--fileselect", action="store_true", default=None, help="Show list of recent journals to chose from")
@@ -116,6 +117,7 @@ profile = args.profile if args.profile is not None else None
 setting_fileselect = args.fileselect if args.fileselect is not None else False
 setting_journal_dir = args.journal if args.journal is not None else getconfig("Settings", "JournalFolder")
 setting_journal_file = args.setfile if args.setfile is not None else None
+setting_autoshutdown_arg = args.autoshutdown if args.autoshutdown is not None else None
 discord_test = args.test if args.test is not None else DISCORD_TEST
 debug_mode = args.debug if args.debug is not None else DEBUG_MODE
 
@@ -322,6 +324,7 @@ setting_bountyfaction = getconfig("Settings", "BountyFaction", True)
 setting_bountyvalue = getconfig("Settings", "BountyValue", False)
 setting_extendedstats = getconfig("Settings", "ExtendedStats", False)
 setting_dynamictitle = getconfig("Settings", "DynamicTitle", True)
+setting_autoshutdown = setting_autoshutdown_arg if setting_autoshutdown_arg is not None else getconfig("Settings", "AutoShutdown", False)
 discord_webhook = args.webhook if args.webhook is not None else getconfig("Discord", "WebhookURL", "")
 discord_forumchannel = getconfig("Discord", "ForumChannel", False)
 discord_thread_cmdr_names = getconfig("Discord", "ThreadCmdrNames", False)
@@ -531,6 +534,9 @@ def processevent(line):
                 logevent(msg_term=f"Completed kills for {msg} ({missions})",
                         emoji="✅", timestamp=logtime, loglevel=log)
                 updatetitle()
+                # Trigger auto-shutdown if all missions completed
+                if len(track.missionsactive) == track.missionredirects and setting_autoshutdown:
+                    shutdown_machine()
             case "ReservoirReplenished":
                 fuelremaining = round((j["FuelMain"] / track.fuelcapacity) * 100)
                 if session.fuellasttime and track.deploytime and logtime > session.fuellasttime:
@@ -715,11 +721,27 @@ def updatetitle(reset=False):
             else:
                 kills_hour = "-/h"
                 lastkill = time_format(round((timeutc - track.deploytime).total_seconds()))
-            
+
             ctypes.windll.kernel32.SetConsoleTitleW(f"💥{kills_hour} ⌚{lastkill} 🎯{track.missionredirects}/{len(track.missionsactive)}")
         elif reset == True:
             ctypes.windll.kernel32.SetConsoleTitleW(f"ED AFK Monitor v{VERSION}")
             debug("Title update")
+
+def shutdown_machine():
+    # Send shutdown notification to Discord and terminal
+    logevent(msg_term=f"{Col.WARN}AUTO-SHUTDOWN TRIGGERED - Machine will shut down in 60 seconds{Col.END}",
+            msg_discord="**🔌 AUTO-SHUTDOWN TRIGGERED**\nMachine will shut down in 60 seconds - all missions completed!",
+            emoji="🔌", loglevel=3)
+
+    print(f"{Col.INFO}Press Ctrl+C to cancel shutdown{Col.END}\n")
+    time.sleep(5)  # Give user time to see the message
+
+    if os.name == "nt":  # Windows
+        os.system("shutdown /s /t 60 /c \"ED AFK Monitor: All missions completed\"")
+    else:  # Linux/Mac
+        os.system("shutdown -h +1 \"ED AFK Monitor: All missions completed\"")
+
+    sys.exit()
 
 def shutdown():
     if track.totalkills > 1:

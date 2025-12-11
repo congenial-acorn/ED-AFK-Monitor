@@ -17,6 +17,10 @@ BountyValue = false
 ExtendedStats = false
 # DynamicTitle uses the window title to display some info (Default: true, only works on Windows OS)
 DynamicTitle = true
+# AutoShutdown triggers automatic shutdown when all missions are completed (Default: false)
+# Can also be enabled via command line: py afk_monitor.py --autoshutdown (or -a)
+# WARNING: This will shut down your machine 60 seconds after all missions are completed!
+AutoShutdown = false
 
 [Discord]
 # Use the settings below to enable Discord webhook integration
