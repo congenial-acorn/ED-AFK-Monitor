@@ -75,7 +75,7 @@ if VERSION < latest_version:
 
 # Load config file
 if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-    configfile = Path(__file__).parents[1] / "afk_monitor.toml"
+    configfile = Path(sys.executable).parent / "afk_monitor.toml"
 else:
     configfile = Path(__file__).parent / "afk_monitor.toml"
 if configfile.is_file():
