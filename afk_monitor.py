@@ -31,10 +31,16 @@ def format_version(version_int):
     else:
         return f"{version_str[0]}.{version_str[1]}.{version_str[2:]}"
 
+def version():
+    major_version = 1
+    minor_version = 0
+    patch_version = 5
+    return f"v{major_version}.{minor_version}.{patch_version}"
+VERSION = 105
+
 # Internals
 DEBUG_MODE = False
-DISCORD_TEST = False
-VERSION = 104
+DISCORD_TEST = False  # Must match version() function: 1.0.5 -> 105
 GITHUB_REPO = "congenial-acorn/ED-AFK-Monitor"
 DUPE_MAX = 5
 MAX_FILES = 10
@@ -79,7 +85,7 @@ except Exception:
     pass
 
 # Print header
-title = f"ED AFK Monitor v{format_version(VERSION)} by Congenial Acorn Developments, forked from v2025094 by CMDR PsiPab"
+title = f"ED AFK Monitor {version()} by Congenial Acorn Developments, forked from v2025094 by CMDR PsiPab"
 print(f"{Col.CYAN}{'='*len(title)}")
 print(f"{title}")
 print(f"{'='*len(title)}{Col.END}\n")
@@ -737,7 +743,7 @@ def updatetitle(reset=False):
 
             ctypes.windll.kernel32.SetConsoleTitleW(f"💥{kills_hour} ⌚{lastkill} 🎯{track.missionredirects}/{len(track.missionsactive)}")
         elif reset == True:
-            ctypes.windll.kernel32.SetConsoleTitleW(f"ED AFK Monitor v{format_version(VERSION)}")
+            ctypes.windll.kernel32.SetConsoleTitleW(f"ED AFK Monitor {version()}")
             debug("Title update")
 
 def shutdown_machine():
@@ -800,11 +806,11 @@ if __name__ == "__main__":
         update_notice = f"\n:arrow_up: Update **[v{latest_version_str}](https://github.com/{GITHUB_REPO}/releases)** available!" if VERSION < latest_version else ""
 
         if discord_forumchannel:
-            discordsend(f"💥 **ED AFK Monitor** 💥 by CMDR PSIPAB ([v{format_version(VERSION)}](https://github.com/{GITHUB_REPO})){update_notice}")
+            discordsend(f"💥 **ED AFK Monitor** 💥 by CMDR PSIPAB ([{version()}](https://github.com/{GITHUB_REPO})){update_notice}")
             webhook.content += f" <@{discord_user}>"
             webhook.edit()
         else:
-            discordsend(f"# 💥 ED AFK Monitor 💥\n-# by CMDR PSIPAB ([v{format_version(VERSION)}](https://github.com/{GITHUB_REPO})){update_notice}")
+            discordsend(f"# 💥 ED AFK Monitor 💥\n-# by CMDR PSIPAB ([{version()}](https://github.com/{GITHUB_REPO})){update_notice}")
         
         logevent(msg_term=f"Monitor started ({journal_file})",
                 msg_discord=f"**Monitor started** ({journal_file})",
