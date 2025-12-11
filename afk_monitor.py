@@ -67,9 +67,9 @@ except Exception:
 
 # Print header
 title = f"ED AFK Monitor v{VERSION} by CMDR PSIPAB"
-print(f"{Col.CYAN}{"="*len(title)}")
+print(f"{Col.CYAN}{'='*len(title)}")
 print(f"{title}")
-print(f"{"="*len(title)}{Col.END}\n")
+print(f"{'='*len(title)}{Col.END}\n")
 if VERSION < latest_version:
     print(f"{Col.YELL}Update v{latest_version} is available!{Col.END}\n{Col.WHITE}Download:{Col.END} https://github.com/{GITHUB_REPO}/releases\n")
 
