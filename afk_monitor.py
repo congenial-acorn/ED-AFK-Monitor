@@ -21,10 +21,20 @@ def fallover(message):
     if sys.argv[0].count("\\") > 1: input("Press ENTER to exit")
     sys.exit()
 
+def format_version(version_int):
+    """Convert integer version (104) to dotted format (1.0.4)"""
+    version_str = str(version_int)
+    if len(version_str) == 1:
+        return f"0.0.{version_str}"
+    elif len(version_str) == 2:
+        return f"0.{version_str[0]}.{version_str[1]}"
+    else:
+        return f"{version_str[0]}.{version_str[1]}.{version_str[2:]}"
+
 # Internals
 DEBUG_MODE = False
 DISCORD_TEST = False
-VERSION = "1.0.4"
+VERSION = 104
 GITHUB_REPO = "congenial-acorn/ED-AFK-Monitor"
 DUPE_MAX = 5
 MAX_FILES = 10
@@ -57,21 +67,24 @@ class Col:
 # Update check
 url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 latest_version = 0
+latest_version_str = ""
 try:
     with urlopen(url, timeout=1) as response:
         if response.status == 200:
             release_data = json.loads(response.read())
-            latest_version = int(release_data["tag_name"][1:])
+            tag = release_data["tag_name"]
+            latest_version_str = tag[1:] if tag.startswith("v") else tag  # Strip "v" prefix
+            latest_version = int(latest_version_str.replace(".", ""))  # "1.0.4" -> 104
 except Exception:
     pass
 
 # Print header
-title = f"ED AFK Monitor v{VERSION} by Congenial Acorn Developments, forked from v2025094 by CMDR PsiPab"
+title = f"ED AFK Monitor v{format_version(VERSION)} by Congenial Acorn Developments, forked from v2025094 by CMDR PsiPab"
 print(f"{Col.CYAN}{'='*len(title)}")
 print(f"{title}")
 print(f"{'='*len(title)}{Col.END}\n")
 if VERSION < latest_version:
-    print(f"{Col.YELL}Update v{latest_version} is available!{Col.END}\n{Col.WHITE}Download:{Col.END} https://github.com/{GITHUB_REPO}/releases\n")
+    print(f"{Col.YELL}Update v{latest_version_str} is available!{Col.END}\n{Col.WHITE}Download:{Col.END} https://github.com/{GITHUB_REPO}/releases\n")
 
 # Load config file
 if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
@@ -724,7 +737,7 @@ def updatetitle(reset=False):
 
             ctypes.windll.kernel32.SetConsoleTitleW(f"💥{kills_hour} ⌚{lastkill} 🎯{track.missionredirects}/{len(track.missionsactive)}")
         elif reset == True:
-            ctypes.windll.kernel32.SetConsoleTitleW(f"ED AFK Monitor v{VERSION}")
+            ctypes.windll.kernel32.SetConsoleTitleW(f"ED AFK Monitor v{format_version(VERSION)}")
             debug("Title update")
 
 def shutdown_machine():
@@ -784,14 +797,14 @@ if __name__ == "__main__":
         updatetitle(True)
 
         # Send Discord startup
-        update_notice = f"\n:arrow_up: Update **[v{latest_version}](https://github.com/{GITHUB_REPO}/releases)** available!" if VERSION < latest_version else ""
+        update_notice = f"\n:arrow_up: Update **[v{latest_version_str}](https://github.com/{GITHUB_REPO}/releases)** available!" if VERSION < latest_version else ""
 
         if discord_forumchannel:
-            discordsend(f"💥 **ED AFK Monitor** 💥 by CMDR PSIPAB ([v{VERSION}](https://github.com/{GITHUB_REPO})){update_notice}")
+            discordsend(f"💥 **ED AFK Monitor** 💥 by CMDR PSIPAB ([v{format_version(VERSION)}](https://github.com/{GITHUB_REPO})){update_notice}")
             webhook.content += f" <@{discord_user}>"
             webhook.edit()
         else:
-            discordsend(f"# 💥 ED AFK Monitor 💥\n-# by CMDR PSIPAB ([v{VERSION}](https://github.com/{GITHUB_REPO})){update_notice}")
+            discordsend(f"# 💥 ED AFK Monitor 💥\n-# by CMDR PSIPAB ([v{format_version(VERSION)}](https://github.com/{GITHUB_REPO})){update_notice}")
         
         logevent(msg_term=f"Monitor started ({journal_file})",
                 msg_discord=f"**Monitor started** ({journal_file})",
