@@ -123,7 +123,7 @@ debug_mode = args.debug if args.debug is not None else DEBUG_MODE
 
 def debug(message):
     if debug_mode:
-        print(f"{Col.WHITE}[Debug]{Col.END} {message} [{datetime.strftime(datetime.now(), "%H:%M:%S")}]")
+        print(f"{Col.WHITE}[Debug]{Col.END} {message} [{datetime.strftime(datetime.now(), '%H:%M:%S')}]")
 
 debug(f"Arguments: {args}")
 debug(f"Config: {config}")
@@ -313,7 +313,7 @@ if profile and not profile in config:
     debug(f"No config settings for '{profile}' found")
     profile = None
 
-print(f"{Col.YELL}Config profile:{Col.END} {profile if profile else "Default"}{config_info}")
+print(f"{Col.YELL}Config profile:{Col.END} {profile if profile else 'Default'}{config_info}")
 if profile: debug(f"Profile '{profile}': {config[profile]}")
 
 # Get settings from config
@@ -429,7 +429,7 @@ def processevent(line):
         match j["event"]:
             case "ShipTargeted" if "Ship" in j:
                 ship = j["Ship_Localised"] if "Ship_Localised" in j else j["Ship"].title()
-                rank = "" if not "PilotRank" in j else f" ({j["PilotRank"]})"
+                rank = "" if not "PilotRank" in j else f" ({j['PilotRank']})"
                 if ship != session.lastsecurity and "PilotName" in j and "$ShipName_Police" in j["PilotName"]:
                     session.lastsecurity = ship
                     logevent(msg_term=f"{Col.WARN}Scanned security{Col.END} ({ship})",
@@ -544,7 +544,7 @@ def processevent(line):
                     fuel_hour = 3600 / fuel_time * (session.fuellastremain-j["FuelMain"])
                     fuel_time_remain = time_format(j["FuelMain"] / fuel_hour * 3600)
                     fuel_time_remain = f" (~{fuel_time_remain})"
-                    #debug(f"Fuel used since previous: {round(session.fuellastremain-j["FuelMain"],2)}t in {time_format(fuel_time)}")
+                    #debug(f"Fuel used since previous: {round(session.fuellastremain-j['FuelMain'],2)}t in {time_format(fuel_time)}")
                 else:
                     fuel_time_remain = ""
 
@@ -609,15 +609,15 @@ def processevent(line):
                 mode = "Private" if j["GameMode"] == "Group" else j["GameMode"]
                 combatrank = f" / {COMBAT_RANKS[track.cmdrcombatrank]}" if track.cmdrcombatrank is not None else ""
                 combatrank += f" +{track.cmdrcombatprogress}%" if track.cmdrcombatprogress is not None and track.cmdrcombatrank < 13 else ""
-                logevent(msg_term=f"Loaded CMDR {j["Commander"]} ({ship} / {mode}{combatrank})",
-                        msg_discord=f"**Loaded CMDR {j["Commander"]}** ({ship} / {mode}{combatrank})",
+                logevent(msg_term=f"Loaded CMDR {j['Commander']} ({ship} / {mode}{combatrank})",
+                        msg_discord=f"**Loaded CMDR {j['Commander']}** ({ship} / {mode}{combatrank})",
                         emoji="🔄", timestamp=logtime, loglevel=2)
             case "Loadout":
                 track.fuelcapacity = j["FuelCapacity"]["Main"] if j["FuelCapacity"]["Main"] >= 2 else 64
                 #debug(f"Fuel capacity: {track.fuelcapacity}")
             case "SupercruiseDestinationDrop" if any(x in j["Type"] for x in ["$MULTIPLAYER", "$Warzone"]):
                 track.sessionstart(True)
-                logevent(msg_term=f"Dropped at {j["Type_Localised"]}",
+                logevent(msg_term=f"Dropped at {j['Type_Localised']}",
                         emoji="🚀", timestamp=logtime, loglevel=2)
                 debug(f"Deploy time by supercruise drop: {track.deploytime}")
             case "ReceiveText" if j["Channel"] == "npc":
@@ -663,7 +663,7 @@ def processevent(line):
                 if session.meritstoreport > 0 and j["MeritsGained"] < 500:
                     session.merits += j["MeritsGained"]
                     track.totalmerits += j["MeritsGained"]
-                    logevent(msg_term=f"Merits: +{j["MeritsGained"]} ({j["Power"]})",
+                    logevent(msg_term=f"Merits: +{j['MeritsGained']} ({j['Power']})",
                              emoji="🎫", timestamp=logtime, loglevel=getloglevel("Merits"))
                     session.meritstoreport -= 1
             case "Location" if j["BodyType"] == "PlanetaryRing":
@@ -675,8 +675,8 @@ def processevent(line):
                 if __name__ == "__main__": sys.exit()
             case "SupercruiseEntry" | "FSDJump":
                 event = "Supercruise entry in" if j["event"] == "SupercruiseEntry" else "FSD jump to"
-                #debug(f"{event} {j["StarSystem"]}")
-                logevent(msg_term=f"{event} {j["StarSystem"]}",
+                #debug(f"{event} {j['StarSystem']}")
+                logevent(msg_term=f"{event} {j['StarSystem']}",
                         emoji="🚀", timestamp=logtime, loglevel=2)
                 track.sessionend()
         track.lasteventname = j["event"]
@@ -856,7 +856,7 @@ if __name__ == "__main__":
                                         track.warnednokills = timemono
                     except Exception as e:
                         if repr(e) != trackingerror:
-                            print(f"{Col.WARN}Warning:{Col.END} Kill rate tracking error: {e} [{datetime.strftime(datetime.now(), "%H:%M:%S")}])")
+                            print(f"{Col.WARN}Warning:{Col.END} Kill rate tracking error: {e} [{datetime.strftime(datetime.now(), '%H:%M:%S')}])")
                             trackingerror = repr(e)
                     
                     time.sleep(1)
